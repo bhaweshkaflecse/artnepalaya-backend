@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
 import { env } from '../../config/env.js'; 
 import { redisClient } from '../../server.js'; 
@@ -97,4 +98,18 @@ export const refreshSession = async (refreshToken) => {
 export const logout = async (userId, deviceId) => {
   await redisClient.del(`auth:refresh:${userId}:${deviceId}`);
   return true;
+};
+
+export const authenticateAdmin = async (email, password) => {
+  const user = await User.findOne({ email }).select('+passwordHash').lean();
+  if (!user) throw Object.assign(new Error('Invalid credentials'), { status: 401 });
+  if (user.role !== 'Admin') throw Object.assign(new Error('Access denied. Admin role required.'), { status: 403 });
+  if (!user.passwordHash) throw Object.assign(new Error('Password login not configured for this account'), { status: 401 });
+
+  const isValid = await bcrypt.compare(password, user.passwordHash);
+  if (!isValid) throw Object.assign(new Error('Invalid credentials'), { status: 401 });
+
+  const tokens = await generateTokens(user._id.toString(), user.role, 'admin-panel');
+  const { passwordHash, ...safeUser } = user;
+  return { user: safeUser, ...tokens };
 };

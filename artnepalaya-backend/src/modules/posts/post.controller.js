@@ -65,7 +65,7 @@ export const getSinglePost = async (req, res, next) => {
 export const getFeed = async (req, res, next) => {
   try {
     const { cursor, limit } = req.query;
-    const result = await postService.getFeed(req.user.id, cursor, limit);
+    const result = await postService.getFeed(req.user?.id || null, cursor, limit);
     res.status(200).json({ success: true, data: result.data, meta: result.meta });
   } catch (err) { next(err); }
 };
