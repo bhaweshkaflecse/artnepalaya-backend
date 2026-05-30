@@ -22,4 +22,7 @@ router.get('/featured', controller.getFeatured);
 router.post('/featured', validate(validation.featurePostSchema), controller.addFeatured);
 router.delete('/featured/:postId', validate(validation.postIdParamsSchema), controller.removeFeatured);
 
+router.get('/config/auth-media', controller.getAuthMedia);
+router.put('/config/auth-media', controller.updateAuthMedia);
+
 export default router;
