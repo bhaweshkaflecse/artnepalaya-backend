@@ -75,6 +75,20 @@ const userSchema = new mongoose.Schema(
       enum: ['active', 'suspended', 'banned'],
       default: 'active',
     },
+    bio: {
+      type: String,
+      maxLength: 300,
+      default: '',
+    },
+    nsfwBlurEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    pushTokens: [
+      {
+        type: String,
+      },
+    ],
   },
   {
     timestamps: true,

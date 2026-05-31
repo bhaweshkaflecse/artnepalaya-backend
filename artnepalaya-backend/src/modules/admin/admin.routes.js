@@ -26,4 +26,12 @@ router.delete('/featured/:postId', validate(validation.postIdParamsSchema), cont
 router.get('/config/auth-media', controller.getAuthMedia);
 router.put('/config/auth-media', controller.updateAuthMedia);
 
+router.post('/notifications/broadcast', controller.broadcastNotification);
+
+router.get('/cms/:slug', controller.getCmsPage);
+router.put('/cms/:slug', controller.updateCmsPage);
+
+router.get('/global-popup', controller.getGlobalPopup);
+router.put('/global-popup', controller.updateGlobalPopup);
+
 export default router;

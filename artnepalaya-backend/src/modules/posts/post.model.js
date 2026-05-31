@@ -17,6 +17,9 @@ const postSchema = new mongoose.Schema({
   // AI Declaration Flag - Must be true for Artnepalaya
   isHumanMade: { type: Boolean, required: true },
   
+  // NSFW flag for content moderation
+  isNsfw: { type: Boolean, default: false },
+
   // Metrics
   likesCount: { type: Number, default: 0 },
   savesCount: { type: Number, default: 0 }

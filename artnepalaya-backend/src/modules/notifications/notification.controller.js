@@ -2,7 +2,8 @@ import * as notificationService from './notification.service.js';
 
 export const getNotifications = async (req, res, next) => {
   try {
-    const result = await notificationService.getUserNotifications(req.user.id, req.query.page, req.query.limit);
+    const { page, limit, filter } = req.query;
+    const result = await notificationService.getUserNotifications(req.user.id, page, limit, filter);
     res.status(200).json({ success: true, data: result.data, meta: result.meta });
   } catch (err) { next(err); }
 };

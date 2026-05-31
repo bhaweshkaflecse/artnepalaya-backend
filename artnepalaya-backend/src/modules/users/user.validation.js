@@ -15,7 +15,10 @@ export const updateProfileSchema = z.object({
     interests: z.array(z.string()).max(10).optional(), 
     
     // Accepts ISO 8601 strings (from mobile app) or native Date objects
-    dob: z.string().datetime().or(z.date()).optional() 
+    dob: z.string().datetime().or(z.date()).optional(),
+
+    bio: z.string().max(300).optional(),
+    nsfwBlurEnabled: z.boolean().optional()
     
   }).strict() // STRICT is crucial here: it prevents hackers from passing {"isAdult": true} or {"status": "active"} in the body
 });

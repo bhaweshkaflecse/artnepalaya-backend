@@ -1,4 +1,5 @@
 import { Notification } from './notification.model.js';
+import { User } from '../users/user.model.js';
 
 export const createNotification = async (payload) => {
   const { recipientId, senderId, postId, type, message } = payload;
@@ -16,13 +17,21 @@ export const createNotification = async (payload) => {
   return Notification.create({ recipientId, senderId, postId, type, message });
 };
 
-export const getUserNotifications = async (userId, page, limit) => {
+export const getUserNotifications = async (userId, page, limit, filter = 'all') => {
   const skip = (page - 1) * limit;
+  const query = { recipientId: userId };
+
+  if (filter === 'unread') {
+    query.isRead = false;
+  } else if (filter === 'read') {
+    query.isRead = true;
+  }
+
   const [notifications, totalItems, unreadCount] = await Promise.all([
-    Notification.find({ recipientId: userId }).sort({ createdAt: -1 }).skip(skip).limit(limit)
+    Notification.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit)
       .populate('senderId', 'username avatarUrl')
       .populate('postId', 'media').lean(),
-    Notification.countDocuments({ recipientId: userId }),
+    Notification.countDocuments(query),
     Notification.countDocuments({ recipientId: userId, isRead: false })
   ]);
   const totalPages = Math.ceil(totalItems / limit);
@@ -35,4 +44,21 @@ export const getUserNotifications = async (userId, page, limit) => {
 export const markAllAsRead = async (userId) => {
   await Notification.updateMany({ recipientId: userId, isRead: false }, { $set: { isRead: true } });
   return true;
+};
+
+export const broadcastNotification = async (title, message) => {
+  const activeUsers = await User.find({ status: 'active' }, '_id').lean();
+  const notifications = activeUsers.map((user) => ({
+    recipientId: user._id,
+    senderId: null,
+    postId: null,
+    type: 'AdminBroadcast',
+    title,
+    message,
+    isRead: false
+  }));
+  if (notifications.length > 0) {
+    await Notification.insertMany(notifications);
+  }
+  return { recipientCount: notifications.length };
 };
