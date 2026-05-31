@@ -7,8 +7,11 @@ import * as controller from './post.controller.js';
 
 const router = Router();
 
-// Protect all post routes
-router.use(authGuard); 
+// === Public Routes (no auth required) ===
+router.get('/feed', validate(validation.feedPaginationSchema), controller.getFeed);
+
+// Protect all routes below
+router.use(authGuard);
 
 // === Core Post Routes ===
 // Note: secureUpload handles the files in memory BEFORE Zod validates the rest of the body!
@@ -20,7 +23,6 @@ router.post(
   controller.createPost
 );
 
-router.get('/feed', validate(validation.feedPaginationSchema), controller.getFeed);
 router.get('/:postId', controller.getSinglePost);
 
 // === Interactions ===

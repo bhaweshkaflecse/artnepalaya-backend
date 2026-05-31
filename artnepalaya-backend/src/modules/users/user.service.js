@@ -31,7 +31,7 @@ export const updateUserProfile = async (userId, updateData) => {
   }
 
   // Define exactly what the user is allowed to change (mapped to our Zod schema)
-  const allowedUpdates = ['username', 'fullName', 'avatarUrl', 'dob', 'role', 'subRoles', 'interests'];
+  const allowedUpdates = ['username', 'fullName', 'avatarUrl', 'dob', 'role', 'subRoles', 'interests', 'bio', 'nsfwBlurEnabled'];
   
   allowedUpdates.forEach((field) => {
     if (updateData[field] !== undefined) {
@@ -70,4 +70,21 @@ export const getUserPosts = async (userId, page, limit) => {
       hasNextPage: page < totalPages
     }
   };
+};
+
+// === Push Token Management ===
+export const registerPushToken = async (userId, token) => {
+  await User.findByIdAndUpdate(
+    userId,
+    { $addToSet: { pushTokens: token } }
+  );
+  return true;
+};
+
+export const removePushToken = async (userId, token) => {
+  await User.findByIdAndUpdate(
+    userId,
+    { $pull: { pushTokens: token } }
+  );
+  return true;
 };

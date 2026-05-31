@@ -13,6 +13,7 @@ const otpVerifyLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
 // PUBLIC
 router.post('/google', validate(validation.googleAuthSchema), controller.googleLogin);
 router.post('/refresh', validate(validation.refreshSchema), controller.refreshToken);
+router.post('/admin-login', validate(validation.adminLoginSchema), controller.adminLogin);
 
 // PROTECTED (Requires Google Login first)
 router.post('/otp/send', authGuard, otpSendLimiter, validate(validation.sendOtpSchema), controller.sendOtp);

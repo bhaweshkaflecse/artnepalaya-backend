@@ -13,6 +13,10 @@ router.use(authGuard);
 router.get('/me', controller.getMe);
 router.put('/me', validate(validation.updateProfileSchema), controller.updateMe);
 
+// === Push Token Routes ===
+router.post('/me/push-token', controller.registerPushToken);
+router.delete('/me/push-token', controller.removePushToken);
+
 // === Public/Other User Routes ===
 // (Order matters! These must go AFTER '/me' so Express doesn't think "me" is a userId)
 router.get('/:userId', controller.getPublicProfile);

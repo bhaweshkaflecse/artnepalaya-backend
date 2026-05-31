@@ -50,3 +50,29 @@ export const getUserPosts = async (req, res, next) => {
     next(err);
   }
 };
+
+export const registerPushToken = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'token is required' } });
+    }
+    await userService.registerPushToken(req.user.id, token);
+    res.status(200).json({ success: true, message: 'Push token registered' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const removePushToken = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'token is required' } });
+    }
+    await userService.removePushToken(req.user.id, token);
+    res.status(200).json({ success: true, message: 'Push token removed' });
+  } catch (err) {
+    next(err);
+  }
+};
