@@ -64,3 +64,8 @@ export const updateAuthMedia = async (req, res, next) => {
     res.status(200).json({ success: true, message: 'Auth media updated' });
   } catch (err) { next(err); }
 };
+
+export const getAnalytics = async (req, res, next) => {
+  try { res.status(200).json({ success: true, data: await adminService.getAnalytics() }); }
+  catch (err) { next(err); }
+};

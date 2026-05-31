@@ -72,3 +72,36 @@ export const removeFeaturedPost = async (postId) => {
   await FeaturedPost.findOneAndDelete({ postId });
   return true;
 };
+
+export const getAnalytics = async () => {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  sevenDaysAgo.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const [postsPerDay, activeUsersResult, newPostsToday] = await Promise.all([
+    Post.aggregate([
+      { $match: { createdAt: { $gte: sevenDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, date: '$_id', count: 1 } }
+    ]),
+    Post.aggregate([
+      { $match: { createdAt: { $gte: sevenDaysAgo } } },
+      { $group: { _id: '$authorId' } },
+      { $count: 'total' }
+    ]),
+    Post.countDocuments({ createdAt: { $gte: today } })
+  ]);
+
+  const activeUsersThisWeek = activeUsersResult.length > 0 ? activeUsersResult[0].total : 0;
+
+  return { postsPerDay, activeUsersThisWeek, newPostsToday };
+};

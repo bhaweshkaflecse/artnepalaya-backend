@@ -10,6 +10,7 @@ router.use(authGuard);
 router.use(requireRole(['Admin'])); // Strictly lock all routes in this file
 
 router.get('/dashboard', controller.getDashboardStats);
+router.get('/analytics', controller.getAnalytics);
 router.get('/users', validate(validation.queryPaginationSchema), controller.getUsers);
 router.put('/users/:userId/status', validate(validation.updateUserStatusSchema), controller.updateUserStatus);
 
