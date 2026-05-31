@@ -337,6 +337,10 @@ async function seedAll() {
     // 1. Create Admin User
     // ----------------------------------------------------------
     console.log('\n--- Creating Admin User ---');
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'admin123';
+    if (!process.env.SEED_ADMIN_PASSWORD) {
+      console.warn('\x1b[33m⚠ WARNING: Using default admin password. Set SEED_ADMIN_PASSWORD env var for production.\x1b[0m');
+    }
     const adminUser = await User.findOneAndUpdate(
       { email: 'admin@artnepalaya.com' },
       {
@@ -345,7 +349,7 @@ async function seedAll() {
           fullName: 'System Administrator',
           role: 'Admin',
           status: 'active',
-          passwordHash: bcryptjs.hashSync('admin123', 10),
+          passwordHash: bcryptjs.hashSync(adminPassword, 10),
           avatarUrl: generateAvatarUrl('SuperAdmin'),
           stats: { followers: 0, following: 0 },
           isAdult: true
