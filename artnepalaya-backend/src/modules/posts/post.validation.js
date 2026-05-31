@@ -11,6 +11,12 @@ export const createPostSchema = z.object({
         errorMap: () => ({ message: "You must declare that this artwork is human-made." })
       })
     ),
+
+    // NSFW flag - convert form-data string "true" into boolean
+    isNsfw: z.preprocess(
+      (val) => val === 'true' || val === true,
+      z.boolean()
+    ).optional().default(false),
     
     // 2. Convert form-data string into array, keep your max(15) and lowercase rules
     tags: z.preprocess(

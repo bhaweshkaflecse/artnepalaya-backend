@@ -47,18 +47,28 @@ export const markAllAsRead = async (userId) => {
 };
 
 export const broadcastNotification = async (title, message) => {
-  const activeUsers = await User.find({ status: 'active' }, '_id').lean();
-  const notifications = activeUsers.map((user) => ({
-    recipientId: user._id,
-    senderId: null,
-    postId: null,
-    type: 'AdminBroadcast',
-    title,
-    message,
-    isRead: false
-  }));
-  if (notifications.length > 0) {
-    await Notification.insertMany(notifications);
-  }
-  return { recipientCount: notifications.length };
+  const BATCH_SIZE = 500;
+  let recipientCount = 0;
+  let skip = 0;
+  let batch;
+
+  do {
+    batch = await User.find({ status: 'active' }, '_id').lean().skip(skip).limit(BATCH_SIZE);
+    if (batch.length > 0) {
+      const notifications = batch.map((user) => ({
+        recipientId: user._id,
+        senderId: null,
+        postId: null,
+        type: 'AdminBroadcast',
+        title,
+        message,
+        isRead: false
+      }));
+      await Notification.insertMany(notifications);
+      recipientCount += notifications.length;
+    }
+    skip += BATCH_SIZE;
+  } while (batch.length === BATCH_SIZE);
+
+  return { recipientCount };
 };
