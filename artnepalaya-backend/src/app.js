@@ -13,6 +13,9 @@ import notificationRoutes from './modules/notifications/notification.routes.js';
 
 const app = express();
 
+// Trust the first proxy (Nginx) so rate limiter sees real client IP
+app.set('trust proxy', 1);
+
 // 1. Apply Global Security Layer FIRST
 // (Includes Helmet, CORS, MongoSanitize, XSS Sanitize, and Rate Limiting)
 applySecurityMiddlewares(app);
