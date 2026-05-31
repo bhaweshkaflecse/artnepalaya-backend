@@ -76,7 +76,7 @@ services:
     image: redis:7.2-alpine
     container_name: art_redis
     ports:
-      - "6379:6379" # Added this so your Node app can cache!
+      - "6380:6379" # Mapped to 6380 to prevent Windows host collisions
     volumes:
       - redis_data:/data
     networks:

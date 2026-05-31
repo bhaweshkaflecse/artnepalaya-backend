@@ -45,11 +45,16 @@ export const getSinglePost = async (postId) => {
 };
 
 export const getFeed = async (userId, cursor, limit) => {
-  const user = await User.findById(userId).select('interests').lean();
-  const userInterests = user?.interests || [];
+  limit = limit || 15;
+
+  let userInterests = [];
+  if (userId) {
+    const user = await User.findById(userId).select('interests').lean();
+    userInterests = user?.interests || [];
+  }
   
   // THE UPGRADE: Caching the feed using Redis! (Caches for 5 minutes)
-  const cacheKey = `feed:${userId}:${cursor || 'start'}:${limit}`;
+  const cacheKey = `feed:${userId || 'guest'}:${cursor || 'start'}:${limit}`;
   
   return await getOrSetCache(cacheKey, 300, async () => {
     const query = cursor ? { _id: { $lt: cursor } } : {};

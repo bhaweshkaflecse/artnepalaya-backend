@@ -7,10 +7,14 @@ import authRoutes from './modules/auth/auth.routes.js';
 import userRoutes from './modules/users/user.routes.js';
 import postRoutes from './modules/posts/post.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
+import configRoutes from './modules/admin/config.routes.js';
 // ... import other modules (tags, notifications, etc.) as needed
 import notificationRoutes from './modules/notifications/notification.routes.js';
 
 const app = express();
+
+// Trust the first proxy (Nginx) so rate limiter sees real client IP
+app.set('trust proxy', 1);
 
 // 1. Apply Global Security Layer FIRST
 // (Includes Helmet, CORS, MongoSanitize, XSS Sanitize, and Rate Limiting)
@@ -30,6 +34,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/posts', postRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/config', configRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 
 // 5. Global Error Handler (MUST BE DEFINED AFTER ROUTES)

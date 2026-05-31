@@ -46,3 +46,13 @@ export const logout = async (req, res, next) => {
     next(err);
   }
 };
+
+export const adminLogin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const result = await authService.authenticateAdmin(email, password);
+    res.status(200).json({ success: true, message: "Admin login successful", data: result });
+  } catch (err) {
+    next(err);
+  }
+};

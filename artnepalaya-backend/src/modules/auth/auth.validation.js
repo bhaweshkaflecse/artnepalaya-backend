@@ -34,3 +34,10 @@ export const logoutSchema = z.object({
     deviceId: z.string().min(1, "deviceId is required")
   })
 });
+
+export const adminLoginSchema = z.object({
+  body: z.object({
+    email: z.string().email(),
+    password: z.string().min(6)
+  })
+});

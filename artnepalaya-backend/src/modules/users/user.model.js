@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema(
     avatarUrl: {
       type: String,
     },
+    passwordHash: {
+      type: String,
+      select: false,
+    },
     dob: {
       type: Date,
     },
