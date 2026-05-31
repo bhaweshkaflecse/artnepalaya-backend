@@ -6,6 +6,8 @@ import { Report } from '../modules/reports/report.model.js';
 import { FeaturedPost } from '../modules/admin/featured.model.js';
 import { AppConfig } from '../modules/admin/appConfig.model.js';
 import { Notification } from '../modules/notifications/notification.model.js';
+import { CmsPage } from '../modules/admin/cmsPage.model.js';
+import { GlobalPopup } from '../modules/admin/globalPopup.model.js';
 import { env } from '../config/env.js';
 
 // ============================================================
@@ -27,11 +29,9 @@ const INTERESTS_POOL = [
 ];
 
 const REPORT_REASONS = [
-  'Inappropriate Content',
-  'Spam',
-  'Copyright Violation',
-  'Harassment',
-  'Misleading Information'
+  'Nudity', 'Fake/Misleading', 'Unmarked AI Content',
+  'Illegal Items', 'Spam', 'Harassment',
+  'Copyright Violation', 'Other'
 ];
 
 const CAPTION_TEMPLATES = [
@@ -250,6 +250,7 @@ function generatePosts(artists, galleries) {
       caption,
       tags,
       isHumanMade: true,
+      isNsfw: i % 10 === 9,
       likesCount: randomInt(5, 500),
       savesCount: randomInt(2, 150)
     });
@@ -328,7 +329,9 @@ async function seedAll() {
         Report.deleteMany({}),
         FeaturedPost.deleteMany({}),
         AppConfig.deleteMany({}),
-        Notification.deleteMany({})
+        Notification.deleteMany({}),
+        CmsPage.deleteMany({}),
+        GlobalPopup.deleteMany({})
       ]);
       console.log('All collections cleared.');
     }
@@ -490,6 +493,95 @@ async function seedAll() {
     console.log('AppConfig auth_background_media created (5 images).');
 
     // ----------------------------------------------------------
+    // 10. Create Notifications (18)
+    // ----------------------------------------------------------
+    console.log('\n--- Creating 18 Notifications ---');
+    const notifications = [
+      // 5 Like notifications
+      { senderId: artists[1]._id, recipientId: artists[0]._id, postId: createdPosts[0]._id, type: 'Like', message: `${artists[1].username} liked your post`, isRead: false },
+      { senderId: artists[2]._id, recipientId: galleries[0]._id, postId: createdPosts[5]._id, type: 'Like', message: `${artists[2].username} liked your post`, isRead: false },
+      { senderId: artLovers[0]._id, recipientId: artists[3]._id, postId: createdPosts[10]._id, type: 'Like', message: `${artLovers[0].username} liked your post`, isRead: true },
+      { senderId: galleries[1]._id, recipientId: artists[4]._id, postId: createdPosts[15]._id, type: 'Like', message: `${galleries[1].username} liked your post`, isRead: false },
+      { senderId: artLovers[2]._id, recipientId: galleries[2]._id, postId: createdPosts[20]._id, type: 'Like', message: `${artLovers[2].username} liked your post`, isRead: true },
+      // 3 Save notifications
+      { senderId: artLovers[1]._id, recipientId: artists[0]._id, postId: createdPosts[2]._id, type: 'Save', message: `${artLovers[1].username} saved your artwork`, isRead: false },
+      { senderId: artists[5]._id, recipientId: artists[1]._id, postId: createdPosts[7]._id, type: 'Save', message: `${artists[5].username} saved your artwork`, isRead: true },
+      { senderId: artLovers[3]._id, recipientId: galleries[1]._id, postId: createdPosts[12]._id, type: 'Save', message: `${artLovers[3].username} saved your artwork`, isRead: false },
+      // 4 Follow notifications
+      { senderId: artLovers[0]._id, recipientId: artists[2]._id, postId: null, type: 'Follow', message: `${artLovers[0].username} started following you`, isRead: false },
+      { senderId: artLovers[1]._id, recipientId: artists[3]._id, postId: null, type: 'Follow', message: `${artLovers[1].username} started following you`, isRead: true },
+      { senderId: artists[6]._id, recipientId: galleries[0]._id, postId: null, type: 'Follow', message: `${artists[6].username} started following you`, isRead: false },
+      { senderId: artLovers[2]._id, recipientId: artLovers[3]._id, postId: null, type: 'Follow', message: `${artLovers[2].username} started following you`, isRead: true },
+      // 3 AdminBroadcast notifications
+      { senderId: null, recipientId: artists[0]._id, postId: null, type: 'AdminBroadcast', title: 'Platform Update', message: 'We have released new community guidelines. Please review them in your settings.', isRead: false },
+      { senderId: null, recipientId: galleries[0]._id, postId: null, type: 'AdminBroadcast', title: 'Platform Update', message: 'Exciting news! Gallery verification badges are now available for eligible accounts.', isRead: false },
+      { senderId: null, recipientId: artLovers[0]._id, postId: null, type: 'AdminBroadcast', title: 'Platform Update', message: 'ArtNepalaya beta feedback survey is now live. Share your thoughts!', isRead: true },
+      // 3 System notifications
+      { senderId: null, recipientId: artists[1]._id, postId: null, type: 'System', message: 'Your profile has been verified. You can now access premium features.', isRead: false },
+      { senderId: null, recipientId: artLovers[1]._id, postId: null, type: 'System', message: 'Welcome to ArtNepalaya! Complete your profile to get personalized recommendations.', isRead: true },
+      { senderId: null, recipientId: galleries[2]._id, postId: null, type: 'System', message: 'Your gallery listing has been approved and is now visible to the community.', isRead: false }
+    ];
+    const createdNotifications = await Notification.insertMany(notifications);
+    console.log(`${createdNotifications.length} notifications created.`);
+
+    // ----------------------------------------------------------
+    // 11. Create CMS Pages (4)
+    // ----------------------------------------------------------
+    console.log('\n--- Creating 4 CMS Pages ---');
+    const cmsPages = [
+      {
+        slug: 'privacy-policy',
+        title: 'Privacy Policy',
+        content: '<h1>Privacy Policy</h1><p>Last updated: January 2025</p><p>ArtNepalaya ("we", "our", "us") is committed to protecting your personal information...</p><h2>Information We Collect</h2><p>We collect information you provide directly: name, email, profile details, artwork uploads, and interaction data.</p><h2>How We Use Your Information</h2><p>We use your data to provide and improve the platform, personalize your experience, and communicate updates.</p><h2>Data Sharing</h2><p>We do not sell your personal information. We may share data with service providers who assist in platform operations.</p><h2>Your Rights</h2><p>You can access, update, or delete your account data at any time through your profile settings.</p>'
+      },
+      {
+        slug: 'about-us',
+        title: 'About Us',
+        content: '<h1>About ArtNepalaya</h1><p>ArtNepalaya is Nepal\'s premier digital platform for artists, galleries, and art enthusiasts.</p><h2>Our Mission</h2><p>To celebrate, preserve, and promote Nepali art by connecting creators with a global community of art lovers.</p><h2>What We Offer</h2><p>A vibrant social platform for sharing artwork, discovering new artists, and supporting the Nepali art ecosystem.</p><h2>Our Community</h2><p>From traditional Thangka painters to contemporary digital artists, ArtNepalaya is home to Nepal\'s most diverse artistic community.</p>'
+      },
+      {
+        slug: 'terms-conditions',
+        title: 'Terms & Conditions',
+        content: '<h1>Terms & Conditions</h1><p>Last updated: January 2025</p><p>By using ArtNepalaya, you agree to these terms.</p><h2>Account Responsibilities</h2><p>You are responsible for maintaining the security of your account and all activities under it.</p><h2>Content Policy</h2><p>All artwork must be human-created. AI-generated content is strictly prohibited. Users must declare originality.</p><h2>Prohibited Content</h2><p>Illegal content, harassment, spam, and copyright-infringing material will be removed and may result in account suspension.</p><h2>Intellectual Property</h2><p>Artists retain ownership of their uploaded work. By posting, you grant ArtNepalaya a license to display the content on the platform.</p>'
+      },
+      {
+        slug: 'community-guidelines',
+        title: 'Community Guidelines',
+        content: '<h1>Community Guidelines</h1><p>ArtNepalaya is a respectful space for artistic expression.</p><h2>Be Respectful</h2><p>Treat all community members with dignity. Harassment, hate speech, and discrimination are not tolerated.</p><h2>Original Work Only</h2><p>Post only artwork you have created. AI-generated images are not permitted. Always credit collaborators.</p><h2>Mark Sensitive Content</h2><p>If your artwork contains nudity or mature themes, use the 18+ toggle during upload.</p><h2>Report Violations</h2><p>Help us maintain a safe community by reporting content that violates these guidelines.</p><h2>Consequences</h2><p>Violations may result in content removal, temporary suspension, or permanent banning depending on severity.</p>'
+      }
+    ];
+
+    for (const page of cmsPages) {
+      await CmsPage.findOneAndUpdate(
+        { slug: page.slug },
+        { $set: { ...page, updatedBy: adminUser._id } },
+        { upsert: true, new: true }
+      );
+    }
+    console.log(`${cmsPages.length} CMS pages created.`);
+
+    // ----------------------------------------------------------
+    // 12. Create Global Popup (1)
+    // ----------------------------------------------------------
+    console.log('\n--- Creating Global Popup ---');
+    await GlobalPopup.findOneAndUpdate(
+      {},
+      {
+        $set: {
+          heading: 'Welcome to ArtNepalaya Beta!',
+          icon: 'celebration',
+          body: 'We are thrilled to have you as part of our beta community. Your feedback helps us build the best platform for Nepali artists. Take a moment to share your thoughts!',
+          ctaText: 'Take Survey',
+          ctaLink: 'https://forms.example.com/beta-feedback',
+          isActive: true,
+          updatedBy: adminUser._id
+        }
+      },
+      { upsert: true, new: true }
+    );
+    console.log('Global Popup created (Active).');
+
+    // ----------------------------------------------------------
     // Summary
     // ----------------------------------------------------------
     console.log('\n============================================');
@@ -506,6 +598,9 @@ async function seedAll() {
     console.log(`  Reports:        ${createdReports.length}`);
     console.log(`  Featured Posts: ${featuredCandidates.length}`);
     console.log(`  AppConfig:      1 (auth_background_media)`);
+    console.log(`  Notifications:  ${createdNotifications.length}`);
+    console.log(`  CMS Pages:      ${cmsPages.length}`);
+    console.log(`  Global Popup:   1 (Active)`);
     console.log('============================================\n');
 
   } catch (error) {
