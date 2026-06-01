@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       // CRITICAL FIX 2: Added 'Admin' to the enum.
       // If 'Admin' isn't here, you won't be able to log into the Admin panel!
-      enum: ['Artist', 'Art Lover', 'Business', 'Admin', null],
+      enum: ['Artist', 'Art Lover', 'Business', 'Gallery', 'Admin', null],
       default: 'Art Lover', // Safer default than null
     },
     subRoles: [

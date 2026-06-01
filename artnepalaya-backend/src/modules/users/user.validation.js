@@ -7,7 +7,7 @@ export const updateProfileSchema = z.object({
     avatarUrl: z.string().url().optional(),
     
     // Admins must be set directly in the DB. We exclude 'Admin' here to prevent privilege escalation!
-    role: z.enum(['Artist', 'Art Lover', 'Business']).optional(), 
+    role: z.enum(['Artist', 'Art Lover', 'Business', 'Gallery']).optional(), 
     
     subRoles: z.array(z.string()).max(5).optional(),
     
