@@ -82,6 +82,27 @@ function generateAvatarUrl(username) {
   return `https://i.pravatar.cc/200?u=${username}`;
 }
 
+// Static Unsplash CDN image URLs (art-themed) to replace unreliable picsum.photos
+const UNSPLASH_ART_IDS = [
+  '1579783902614-a3fb3927b6a5',
+  '1578926288018-1b09fdfa5eb6',
+  '1513364776144-60967b0f800f',
+  '1547891654-e66ed7ebb968',
+  '1460661419201-fd4cecdf8a8b',
+  '1549887534-1541e9326642',
+  '1578321272176-b7bbc0679853',
+  '1558618666-fcd25c85f82e',
+  '1544735716-392fe2489ffa',
+  '1565017386257-337e10db93e7'
+];
+
+let _unsplashIndex = 0;
+function getNextArtImageUrl() {
+  const id = UNSPLASH_ART_IDS[_unsplashIndex % UNSPLASH_ART_IDS.length];
+  _unsplashIndex++;
+  return `https://images.unsplash.com/photo-${id}?w=1080&q=80`;
+}
+
 // ---------- User Definitions ----------
 
 function buildArtistUsers() {
@@ -232,7 +253,7 @@ function generatePosts(artists, galleries) {
         });
       } else {
         media.push({
-          url: `https://picsum.photos/seed/art_nepal_${i}_${m}/1080/1350`,
+          url: getNextArtImageUrl(),
           providerId: `seed_img_${i}_${m}`,
           type: 'image'
         });
