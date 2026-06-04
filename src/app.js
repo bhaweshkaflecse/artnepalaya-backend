@@ -10,6 +10,7 @@ import adminRoutes from './modules/admin/admin.routes.js';
 import configRoutes from './modules/admin/config.routes.js';
 // ... import other modules (tags, notifications, etc.) as needed
 import notificationRoutes from './modules/notifications/notification.routes.js';
+import communityRoutes from './modules/community/community.routes.js';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/api/v1/posts', postRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/config', configRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/community', communityRoutes);
 
 // 5. Global Error Handler (MUST BE DEFINED AFTER ROUTES)
 app.use(globalErrorHandler);
